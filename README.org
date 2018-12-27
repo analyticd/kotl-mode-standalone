@@ -1,0 +1,23 @@
+* KOutliner (freed from Hyberbole)
+I wanted to extract kotl-mode out of Hyberbole so I moved the kotl directory
+from Hyberbole project into its own repo, turned on debugging on error in Emacs
+and kept loading it and using it until I copied over the the bits of hyperbole
+that kotl-mode actually depends on (for my use). Additional things will probably
+blow up as I begin to use more features of kotl-mode at which time I'll update
+this repo. See the HY-COPY and COPYING files (copied over from the hyperbole
+repo) for license information.
+
+Here is my use-package form:
+
+#+begin_src emacs-lisp         
+(use-package kotl-mode
+  :load-path (lambda () (expand-file-name "github.com/analyticd/kotl" ghq-root))
+  :mode "\\.kotl\\'"
+  :preface
+  ;; Stubs to remove hyperbole dependence
+  (require 'needed-missing-hyperbole-bits))
+#+end_src
+
+Links:
+- [[https://www.emacswiki.org/emacs/Koutliner][EmacsWiki: Koutliner]]
+- [[https://github.com/rswgnu/hyperbole][Hyperbole git repo]]
