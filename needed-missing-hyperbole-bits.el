@@ -32,21 +32,26 @@ Resolves autoloadable function symbols properly."
 
 ;; From hact.el
 (defun action:params (action)
-  "Returns unmodified ACTION parameter list.
-Autoloads action function if need be to get the parameter list."
-  (when (and (symbolp action) (fboundp action))
-    (setq action (hypb:indirect-function action)))
+  "Returns unmodified ACTION parameter list."
   (cond ((null action) nil)
-        ((listp action)
-         (if (eq (car action) 'autoload)
-             (error "(action:params): Autoload not supported: %s" action)
-           (car (cdr action))))
-        ((hypb:emacs-byte-code-p action)
-         (if (fboundp 'compiled-function-arglist)
-             (compiled-function-arglist action)
-           (action:params-emacs action)))
-        ((symbolp action)
-         (car (cdr (and (fboundp action) (hypb:indirect-function action)))))))
+	((symbolp action)
+	 (car (cdr
+	       (and (fboundp action) (hypb:indirect-function action)))))
+	((listp action)
+	 (if (eq (car action) 'autoload)
+	     (error "(action:params): Autoload not supported: %s" action)
+	   (car (cdr action))))
+	((hypb:emacs-byte-code-p action)
+	 (if (fboundp 'compiled-function-arglist)
+	     (compiled-function-arglist action)
+	   ;; Turn into a list for extraction.  Under Emacs 25, the
+	   ;; result could be a parameter list or an integer, a
+	   ;; bitstring representing a variable length argument list,
+	   ;; in which case there is no present way to get the
+	   ;; argument list, so just return nil.  See "(elisp)Byte-Code
+	   ;; Objects".
+	   (let ((params (car (cdr (cons nil (append action nil))))))
+	     (if (listp params) params))))))
 
 ;; From set.el
 (defvar set:equal-op 'equal
