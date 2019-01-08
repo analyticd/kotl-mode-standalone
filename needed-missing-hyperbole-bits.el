@@ -2,8 +2,9 @@
 
 ;; Copied bits to remove hyperbole dependence
 
-;; Copied htz.el over from hyperbole proper
+;; Copied htz.el and set.el over from hyperbole proper
 (require 'htz)
+(require 'set)
 
 ;; From hload-path.el
 (defconst hyperb:emacs-p
@@ -52,42 +53,6 @@ Resolves autoloadable function symbols properly."
 	   ;; Objects".
 	   (let ((params (car (cdr (cons nil (append action nil))))))
 	     (if (listp params) params))))))
-
-;; From set.el
-(defvar set:equal-op 'equal
-  "Comparison function used by set operators.
-It must be a function of two arguments which returns non-nil only when
-the arguments are equivalent.")
-
-(defun set:member (elt set)
-  "Returns non-nil if ELT is an element of SET.
-The value is actually the tail of SET whose car is ELT.
-Uses `set:equal-op' for comparison."
-  (while (and set (not (funcall set:equal-op elt (car set))))
-    (setq set (cdr set)))
-  set)
-
-(defmacro set:add (elt set)
-  "Adds element ELT to SET and then returns SET.
-Uses `set:equal-op' for comparison.
-Use (setq set (set:add elt set)) to assure set is always properly modified."
-  `(cond ((set:member ,elt ,set) ,set)
-         (,set (setq ,set (cons ,elt ,set)))
-         (t (list ,elt))))
-
-(defmacro set:remove (elt set)
-  "Removes element ELT from SET and returns new set.
-Assumes SET is a valid set.  Uses `set:equal-op' for comparison.
-Use (setq set (set:remove elt set)) to assure set is always properly modified."
-  `(let ((rest (set:member ,elt ,set))
-         (rtn ,set))
-     (if rest
-         (cond ((= (length rtn) 1) (setq rtn nil))
-               ((= (length rest) 1)
-                (setcdr (nthcdr (- (length rtn) 2) rtn) nil))
-               (t (setcar rest (car (cdr rest)))
-                  (setcdr rest (cdr (cdr rest))))))
-     rtn))
 
 ;; From hinit.el
 (defvar   hyperb:user-email "foo@bar.org"
@@ -357,3 +322,4 @@ See also documentation for `interactive'."
 					                               (cons val results)))))
 		              (nreverse results))))
 	        (setq hargs:reading-p prev-reading-p))))))
+
